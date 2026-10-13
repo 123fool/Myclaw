@@ -21,22 +21,19 @@
 - **工具与技能体系**：工具层覆盖 URL 抓取、代码执行、文件读取、知识库检索、终端执行等能力，配合技能扫描与 `SKILL.md` 声明式技能文件实现渐进式加载，自动拼接 System Prompt。
 - **前置安全审查**：基于 Guardian 中间件接入使用 LoRA 微调的 **Qwen3.5-4B** 安全分类器，在 Agent 执行前拦截提示词注入与越权请求。项目自建安全对抗数据集上的评测记录为：安全拦截准确率由 **72% 提升至 89%**，误报率控制在 **5% 以下**。
 
-模型训练与相关评测在仓库外完成；当前仓库提供 Guardian 模型服务的接入与执行链路，不包含训练数据、微调权重或上述指标的评测材料。
+## 后续规划
 
-## 适合谁
-拿来学习和扩展Agent功能的你
-## TODO LIST
-- 学习Claude Code，尝试融合会话压缩、subagent分配、System Prompt优化等机制
+- 优化会话压缩、任务分配与 System Prompt 管理。
 - 加入定时任务、心跳检测等功能
 
-## 为什么是它
+## 设计特点
 
 - **可审计**：会话在 `sessions/*.json`，记忆对象与证据可追溯到具体轮次；索引（向量 / BM25）可丢弃重建；搭配Langfuse实现Query全链路追踪
 - **分层记忆**：v2 将「结构化检索对象」与「原始 verbatim 证据」分开，命中后可回跳，而不是只剩一段模型摘要。
 - **工程化 Agent 栈**：基于 **LangChain 1.x `create_agent`**，可选 **Guardian 前置审查**、**对话摘要中间件**、**Postgres Checkpointer**；与 **Langfuse** 等追踪可选对接。
 - **技能即文档**：技能目录 + `SKILL.md`，配合快照按需加载，扩展和 Code Review 都轻量。
 
-## 它现在能做什么
+## 核心功能
 
 - **流式对话**：FastAPI + SSE，推送 token、工具调用与分段回复。
 - **会话持久化**：每轮写入 `backend/sessions/*.json`。
@@ -123,7 +120,7 @@ npm run dev
 4. 设置 `MEMORY_BACKEND=v2`，再问依赖历史语境的问题；可选切换 `MEMORY_V2_INJECT` 感受工具注入与强注入差异。
 5. 在 `backend/sessions/*.json` 与 `memory_module_v2` 相关存储中对照蒸馏结果与检索命中，确认数据真实落盘、可追溯。
 
-## memory_module_v2 是什么
+## 长期记忆模块
 
 新一代长期记忆模块：目标不是「把所有内容塞进向量库」，而是 **索引层（可检索的结构化对象）** + **证据层（原始对话片段）**。
 
@@ -173,7 +170,7 @@ MEMORY_V2_INJECT_TOP_K=3
 
 ### Guardian（前置安全）
 
-Guardian 支持单独配置兼容 API 的安全检测模型。仓库不包含微调模型权重；需要配置模型服务和 API Key 后启用。未配置时，可设置 `GUARDIAN_ENABLED=false` 暂时跳过此功能。
+Guardian 通过兼容 API 接入安全检测模型，可单独配置模型服务和 API Key。未配置时，可设置 `GUARDIAN_ENABLED=false` 暂时跳过此功能。
 
 在 `backend/config/.env` 中常用项：
 
@@ -236,10 +233,6 @@ Myclaw/
 - （启用 v2 时）记忆检索结果
 
 修改这些文件后，**下一轮请求即可生效**（无需改 Python 业务代码）。
-
-## 本地数据
-
-公开仓库提供源码和配置示例，不包含历史会话、个人偏好、记忆数据库、本地知识数据集或原演示截图。`backend/config/.env.example` 中的密钥字段为空，请在本地 `.env` 中配置。
 
 ## 技术来源与致谢
 
