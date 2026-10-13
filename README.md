@@ -243,6 +243,4 @@ Myclaw/
 
 ## 技术来源与致谢
 
-- 当前代码基于 [zhouyan6/miniOpenClaw](https://github.com/zhouyan6/miniOpenClaw) 整理，项目名称与维护信息已调整为 Myclaw。
 - memory_module_v2的思路论文来源（https://arxiv.org/abs/2603.13017）
-- 初版项目思路参考 [lyxhnu/langchain-miniopenclaw](https://github.com/lyxhnu/langchain-miniopenclaw)。
